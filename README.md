@@ -1,2 +1,9 @@
-# distributed_integral_solver
-Software architecture final homework 
+# Distributed_integral_solver
+
+## Miembros
+
+### Santiago Arboleda Velasco - A00369824
+###
+###
+###
+
