@@ -1,4 +1,6 @@
-rootProject.name = 'Distributed_Integrals'
+rootProject.name = 'src'
 
-include ':server'
+include ':broker'
 include ':client'
+include ':server'
+

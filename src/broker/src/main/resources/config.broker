@@ -1,0 +1,3 @@
+Ice.Default.Host=localhost
+
+Broker.Endpoints=tcp -p 9099

@@ -47,7 +47,7 @@ public class IntegralStructure {
     @Override
     public String toString() {
 
-        return "-- " + functionS + " -- " + lRange + " y " + functionS;
+        return "-------------" + "La ecuacion: " + functionS + lRange + " y " + functionS;
     }
 
 }

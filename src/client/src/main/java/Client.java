@@ -1,65 +1,93 @@
-import java.math.*;
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Object;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.Util;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+import Modules.BrokerPrx;
+import Modules.ClientPrx;
+import Modules.IntegralStructure;
 
 public class Client {
 
-    private static UserInterface ui;
+    private static BrokerPrx bPrx;
+    private static ClientPrx cPrx;
 
     public static void main(String[] args) {
 
-        uiReceiver();
+        List<String> extraArgs = new ArrayList<String>();
 
-        if (args.length == 0) {
+        try (Communicator communicator = Util.initialize(args, "config.client", extraArgs)) {
 
-            applicationStart();
-        } else {
+            bPrx = BrokerPrx.checkedCast(communicator.propertyToProxy("Broker.Proxy")).ice_twoway().ice_secure(false);
 
-            if (args[0].equalsIgnoreCase("test") && args.length == 6) {
+            if (bPrx == null) {
 
-                tests(args);
+                throw new Error("El proxy es invalido");
+            }
+
+            ObjectAdapter adapter = communicator.createObjectAdapter("Client");
+            Object servent = new Controller();
+            adapter.add(servent, Util.stringToIdentity("Client"));
+            adapter.activate();
+            cPrx = ClientPrx
+                    .checkedCast(adapter.createProxy(Util.stringToIdentity("Client")).ice_twoway().ice_secure(false));
+
+            if (args.length == 0) {
+
+                clientStart();
             } else {
 
-                System.out.println("Error: Argumentos inválidos. Por favor, intente de nuevo.");
+                if (args[0].equalsIgnoreCase("test") && args.length == 6) {
+
+                    System.err.println(" ");
+                } else {
+
+                    System.out.println("Error: Argumentos inválidos. Por favor, intente de nuevo.");
+                }
+            }
+
+            if (!extraArgs.isEmpty()) {
+
+                System.err.println("Demasiados argumentos");
+
+                for (String v : extraArgs) {
+
+                    System.out.println(v);
+                }
             }
         }
     }
 
-    private static void uiReceiver() {
-
-        ui = new UserInterface();
-    }
-
-    private static void applicationStart() {
+    private static void clientStart() {
 
         boolean comparator = true;
 
         while (comparator) {
 
-            String query = ui.menu();
+            String input = menu();
 
-            if (!queryV(query)) {
+            double lRange = 0;
+            double uRange = 0;
 
-                System.out.println("La consulta no es valida.");
-                continue;
-            }
-
-            String lRange = "";
-            String uRange = "";
-
-            if (!query.equalsIgnoreCase("exit")) {
+            if (!input.equalsIgnoreCase("exit")) {
 
                 boolean ranges = false;
 
                 while (!ranges) {
 
-                    lRange = ui.lMenu();
-                    uRange = ui.uMenu();
+                    String low = lMenu();
+                    String upp = uMenu();
 
                     try {
 
-                        double low = Double.parseDouble(lRange);
-                        double upp = Double.parseDouble(uRange);
+                        lRange = Double.parseDouble(low);
+                        uRange = Double.parseDouble(upp);
 
-                        if (low >= upp) {
+                        if (lRange >= uRange) {
 
                             System.out.println("Error");
                         } else {
@@ -68,25 +96,13 @@ public class Client {
                         }
                     } catch (NumberFormatException e) {
 
-                        System.out.println("Error, numero invalido");
+                        System.out.println("Dato invalido");
                     }
                 }
 
-                IntegralStructure integral = buildI(query, lRange, uRange);
-                IMonte_Carlo monte_carlo = new IMonte_Carlo();
-                long initiation = System.nanoTime();
-                BigDecimal res = monte_carlo.development(integral);
-                long end = System.nanoTime();
-                long execution = end - initiation;
-                double performance = execution / 1_000_000_000.0;
-                double throughput = 1.0 / performance;
-                String filename = "results.txt";
+                IntegralStructure integral = new IntegralStructure(input, lRange, uRange);
 
-                System.out.println(integral.toString() + " = " + res);
-                System.out.println("Latencia: " + performance + " s");
-                System.out.println("Throughput: " + throughput + " por segundo");
-
-                monte_carlo.keep(filename, integral, res);
+                bPrx.developI(cPrx, integral);
 
             } else {
 
@@ -95,38 +111,60 @@ public class Client {
         }
     }
 
-    private static IntegralStructure buildI(String funct, String lwrRange, String upprRange) {
+    private static String menu() {
 
-        String functionS = funct;
-        Double lRange = Double.parseDouble(lwrRange);
-        Double uRange = Double.parseDouble(upprRange);
+        String task = "";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        return new IntegralStructure(functionS, lRange, uRange);
-    }
+        try {
 
-    private static boolean queryV(String input) {
+            System.out.println("\n!--------------------------------------------------!");
+            System.out.println(
+                    "Hola, Bienvenido\nSi tu escribes (exit) la conexion finaliza o si tu escribes (shutdown) sales y el server se apaga");
+            System.out.print("Escribe un mensaje al servidor: ");
 
-        return input.matches("[0-9xX\\^\\+\\-\\*/\\.\\(\\) ]+");
-    }
+            task = reader.readLine();
+        } catch (IOException e) {
 
-    private static void tests(String[] args) {
-
-        if (args[1].equals("1")) {
-
-            BigInteger numbers = new BigInteger(args[2]);
-            IMonte_Carlo monte_carlo = new IMonte_Carlo(numbers);
-            IntegralStructure integral = new IntegralStructure(args[3], Double.parseDouble(args[4]),
-                    Double.parseDouble(args[5]));
-            long initiation = System.nanoTime();
-            BigDecimal res = monte_carlo.development(integral);
-            long end = System.nanoTime();
-            long execution = end - initiation;
-            double performance = execution / 1_000_000_000.0;
-
-            System.out.println(res.doubleValue());
-            System.out.println("Latencia: " + performance + " segundos");
-
+            e.printStackTrace();
         }
 
+        return task;
+    }
+
+    private static String lMenu() {
+
+        String lowRange = "";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        try {
+
+            System.out.println("\n!--------------------------------------------------!");
+            System.out.print("Escribe el valor que esta abajo: ");
+            lowRange = reader.readLine();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+        return lowRange;
+    }
+
+    private static String uMenu() {
+
+        String uppRange = "";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        try {
+
+            System.out.println("\n!--------------------------------------------------!");
+            System.out.print("Escribe el valor que esta arriba: ");
+            uppRange = reader.readLine();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+        return uppRange;
     }
 }
