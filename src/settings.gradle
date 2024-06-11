@@ -1,0 +1,6 @@
+rootProject.name = 'src'
+
+include ':broker'
+include ':client'
+include ':server'
+

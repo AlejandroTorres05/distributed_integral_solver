@@ -1,0 +1,7 @@
+
+## dsa
+#Hello.Proxy=hello:ws -p 10002:udp -p 10000:wss -p 10003
+
+Broker.Proxy=Broker:tcp -p 9099
+Ice.Default.Host=localhost
+Client.Endpoints=tcp -h localhost

@@ -1,0 +1,5 @@
+Broker.Proxy=Broker:tcp -p 9099
+
+Ice.Default.Host=localhost
+
+Server.Endpoints=tcp -h localhost

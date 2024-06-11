@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.zeroc.gradle.ice-builder.slice' version '1.5.0' apply false
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.zeroc.gradle.ice-builder.slice'
+
+    group = 'org.example'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://maven.google.com' }
+    }
+    
+    dependencies {
+        implementation 'com.zeroc:ice:3.7.6'
+        implementation 'net.objecthunter:exp4j:0.4.8'
+        implementation 'org.jfree:jfreechart:1.5.3'
+        implementation 'org.jfree:jcommon:1.0.24'
+        testImplementation platform('org.junit:junit-bom:5.9.1')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+    }
+
+    jar {
+        manifest {
+            attributes(
+                "Main-Class": project.name.capitalize(),
+                "Class-Path": configurations.runtimeClasspath.resolve().collect { it.toURI() }.join(' ')
+            )
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    slice {
+        java {
+            files = [file("../Modules.ice")]
+        }
+    }
+
+    sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/broker/src/main/java']
+        }
+    }
+}
+
+
+}
