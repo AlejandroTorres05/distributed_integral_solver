@@ -11,14 +11,12 @@ public class Broker {
 
             System.out.println("\n!--------------------------------------------------!");
             System.out.println("BROKER\n");
-            System.out.print("---------------------------------------------------");
+            System.out.print("!---------------------------------------------------!");
 
             ObjectAdapter adapter = communicator.createObjectAdapter("Broker");
             Object manipulator = new Manipulator();
-
             adapter.add(manipulator, Util.stringToIdentity("Broker"));
             adapter.activate();
-
             communicator.waitForShutdown();
         }
     }

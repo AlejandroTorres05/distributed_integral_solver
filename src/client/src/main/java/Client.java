@@ -40,14 +40,7 @@ public class Client {
 
                 clientStart();
             } else {
-
-                if (args[0].equalsIgnoreCase("test") && args.length == 6) {
-
-                    System.err.println(" ");
-                } else {
-
-                    System.out.println("Error: Argumentos inválidos. Por favor, intente de nuevo.");
-                }
+                System.out.println("Error: Argumentos inválidos. Por favor, intente de nuevo.");
             }
 
             if (!extraArgs.isEmpty()) {
@@ -69,7 +62,6 @@ public class Client {
         while (comparator) {
 
             String input = menu();
-
             double lRange = 0;
             double uRange = 0;
 
@@ -101,7 +93,6 @@ public class Client {
                 }
 
                 IntegralStructure integral = new IntegralStructure(input, lRange, uRange);
-
                 bPrx.developI(cPrx, integral);
 
             } else {
@@ -119,8 +110,7 @@ public class Client {
         try {
 
             System.out.println("\n!--------------------------------------------------!");
-            System.out.println(
-                    "Hola, Bienvenido\nSi tu escribes (exit) la conexion finaliza o si tu escribes (shutdown) sales y el server se apaga");
+            System.out.println("Hola, Bienvenido\nexit para salir");
             System.out.print("Escribe un mensaje al servidor: ");
 
             task = reader.readLine();
@@ -134,37 +124,37 @@ public class Client {
 
     private static String lMenu() {
 
-        String lowRange = "";
+        String lower = "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         try {
 
             System.out.println("\n!--------------------------------------------------!");
             System.out.print("Escribe el valor que esta abajo: ");
-            lowRange = reader.readLine();
+            lower = reader.readLine();
         } catch (IOException e) {
 
             e.printStackTrace();
         }
 
-        return lowRange;
+        return lower;
     }
 
     private static String uMenu() {
 
-        String uppRange = "";
+        String upper = "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         try {
 
             System.out.println("\n!--------------------------------------------------!");
             System.out.print("Escribe el valor que esta arriba: ");
-            uppRange = reader.readLine();
+            upper = reader.readLine();
         } catch (IOException e) {
 
             e.printStackTrace();
         }
 
-        return uppRange;
+        return upper;
     }
 }

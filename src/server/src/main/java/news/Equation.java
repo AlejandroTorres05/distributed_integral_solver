@@ -1,3 +1,5 @@
+package news;
+
 @FunctionalInterface
 public interface Equation {
 

@@ -1,6 +1,5 @@
 import java.util.*;
 import java.lang.Exception;
-//import com.zeroc.Ice.*;
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.Object;
 import com.zeroc.Ice.ObjectAdapter;
@@ -16,7 +15,7 @@ public class Server {
     public static void main(String[] args) {
 
         System.out.println(
-                "\n************SERVIDOR ABIERTO************* Toca darle enter al cliente para que muestre las cosas");
+                "\n************SERVIDOR ABIERTO*************");
 
         List<String> extraArgs = new ArrayList<String>();
 
@@ -25,17 +24,16 @@ public class Server {
             bPrx = BrokerPrx.checkedCast(communicator.propertyToProxy("Broker.Proxy")).ice_twoway().ice_secure(false);
 
             if (bPrx == null) {
-                throw new Error("Proxy invalido para el broker, no se pudo crear");
+                throw new Error("No se pudo crear");
             }
 
             ObjectAdapter adapter = communicator.createObjectAdapter("Server");
-            Object butler_server = new Butler();
+            Object butler_server = new Butler(bPrx);
             adapter.add(butler_server, Util.stringToIdentity("Server"));
             adapter.activate();
 
             sPrx = ServerPrx
                     .checkedCast(adapter.createProxy(Util.stringToIdentity("Server")).ice_twoway().ice_secure(false));
-
             bPrx.attachServer(sPrx);
 
             if (!extraArgs.isEmpty()) {

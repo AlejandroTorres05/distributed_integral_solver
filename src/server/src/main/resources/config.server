@@ -1,8 +1,5 @@
 Broker.Proxy=Broker:tcp -p 9099
 
-#dsa
-Ice.ThreadPool.Server.Size = 50
-
 Ice.Default.Host=localhost
 
 Server.Endpoints=tcp -h localhost

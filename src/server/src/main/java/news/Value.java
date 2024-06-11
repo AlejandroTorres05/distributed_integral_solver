@@ -1,12 +1,14 @@
+package news;
+
 import java.util.Random;
 
-public class ValueRandom {
+public class Value {
 
     private final Random random = new Random();
     private double lLimit;
     private double uLimit;
 
-    public ValueRandom(double lLimit, double uLimit) {
+    public Value(double lLimit, double uLimit) {
         this.lLimit = lLimit;
         this.uLimit = uLimit;
     }
